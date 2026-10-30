@@ -1,0 +1,7 @@
+invoice_id,customer_name,customer_id,amount,invoice_date
+INV001,Rahul Sharma,C001,5000,2026-10-01
+INV002,Amit Verma,C002,8000,2026-10-03
+INV003,Priya Singh,C003,3000,2026-10-05
+INV004,Neha Gupta,C004,6500,2026-10-06
+INV005,Rohan Mehta,C005,4500,2026-10-08
+INV006,Karan Malhotra,C006,7000,2026-10-10

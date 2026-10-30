@@ -1,0 +1,7 @@
+transaction_id,description,customer_id,amount,payment_date,reference
+TXN101,Rahul Sharma INV001,C001,5000,2026-10-04,INV001
+TXN102,Amit V,C002,8000,2026-10-06,
+TXN103,Unknown Transfer,,2000,2026-10-07,
+TXN104,Neha Gupta Payment,C004,6500,2026-10-08,
+TXN105,Rohan Mehta,C005,4500,2026-10-09,
+TXN106,Karan Malhotra,C006,7000,2026-10-11,
