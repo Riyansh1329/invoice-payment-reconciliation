@@ -449,8 +449,6 @@ if page == "Dashboard":
             use_container_width=True,
             hide_index=True
         )
-
-
 # ==========================================
 # 6. UPLOAD RECORDS
 # ==========================================
@@ -460,14 +458,12 @@ elif page == "Upload Records":
     st.title("Upload Financial Records")
 
     st.write(
-        "Upload CSV files. Column names are flexible; "
-        "required fields are listed below."
+        "Upload your invoice and payment CSV files."
     )
 
     a, b = st.columns(2)
 
     with a:
-
         inv_file = st.file_uploader(
             "Invoice CSV",
             type="csv",
@@ -475,121 +471,45 @@ elif page == "Upload Records":
         )
 
     with b:
-
         pay_file = st.file_uploader(
             "Payment CSV",
             type="csv",
             key="pay_upload"
         )
 
-    with st.expander("Try Demo Data", expanded=False):
-
-        use_demo = st.button(
-            "Load Demo Data",
-            type="secondary"
-        )
-
-        if use_demo:
-
-            try:
-
-                st.session_state.invoices = prepare_invoices(
-                    pd.read_csv("data/invoices.csv")
-                )
-
-                st.session_state.payments = prepare_payments(
-                    pd.read_csv("data/payments.csv")
-                )
-
-                issues = validate_pair(
-                    st.session_state.invoices,
-                    st.session_state.payments
-                )
-
-                if issues:
-
-                    for issue in issues:
-                        st.error(issue)
-
-                else:
-
-                    st.success("Demo records loaded successfully.")
-
-            except Exception as e:
-
-                st.error(f"Could not load demo data: {e}")
-
-    # Invoice preview
-
-    if inv_file is not None:
-
-        try:
-
-            raw = pd.read_csv(inv_file)
-
-            st.subheader("Invoice Preview")
-
-            st.dataframe(
-                raw.head(8),
-                use_container_width=True,
-                hide_index=True
-            )
-
-            st.session_state["_raw_inv"] = raw
-
-        except Exception as e:
-
-            st.error(f"Could not read invoice CSV: {e}")
-
-    # Payment preview
-
-    if pay_file is not None:
-
-        try:
-
-            raw = pd.read_csv(pay_file)
-
-            st.subheader("Payment Preview")
-
-            st.dataframe(
-                raw.head(8),
-                use_container_width=True,
-                hide_index=True
-            )
-
-            st.session_state["_raw_pay"] = raw
-
-        except Exception as e:
-
-            st.error(f"Could not read payment CSV: {e}")
-
-    # Validate and prepare records
+    st.markdown("---")
 
     if st.button(
-        "Upload & Validate Records",
-        type="primary"
+        "📤 Upload Data",
+        type="primary",
+        use_container_width=True
     ):
 
         if inv_file is None or pay_file is None:
 
-            st.error("Please select both CSV files.")
+            st.error(
+                "Please select both Invoice and Payment CSV files."
+            )
 
         else:
 
             try:
 
+                # Read invoice CSV
                 inv = prepare_invoices(
                     pd.read_csv(
                         io.BytesIO(inv_file.getvalue())
                     )
                 )
 
+                # Read payment CSV
                 pay = prepare_payments(
                     pd.read_csv(
                         io.BytesIO(pay_file.getvalue())
                     )
                 )
 
+                # Validate records
                 issues = validate_pair(inv, pay)
 
                 if issues:
@@ -602,26 +522,42 @@ elif page == "Upload Records":
                     st.session_state.invoices = inv
                     st.session_state.payments = pay
 
+                    # Reset old reconciliation result
+                    st.session_state.result = None
+
                     st.success(
-                        f"Validated {len(inv)} invoices "
-                        f"and {len(pay)} payments. "
-                        "Go to Reconciliation."
+                        "Data uploaded successfully!"
+                    )
+
+                    st.info(
+                        f"Ready: {len(inv)} invoices "
+                        f"and {len(pay)} payments."
                     )
 
             except Exception as e:
 
-                st.error(str(e))
+                st.error(f"Upload failed: {e}")
 
     if (
         st.session_state.invoices is not None
         and st.session_state.payments is not None
     ):
 
-        st.success(
-            f"Ready: {len(st.session_state.invoices)} invoices "
-            f"and {len(st.session_state.payments)} payments."
+        st.markdown("---")
+
+        st.subheader("Uploaded Data Summary")
+
+        c1, c2 = st.columns(2)
+
+        c1.metric(
+            "Total Invoices",
+            len(st.session_state.invoices)
         )
 
+        c2.metric(
+            "Total Payments",
+            len(st.session_state.payments)
+        )
 
 # ==========================================
 # 7. RECONCILIATION
